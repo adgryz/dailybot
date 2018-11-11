@@ -149,3 +149,7 @@ sftp-config.json
 # Visual Studio Code - https://code.visualstudio.com/
 .settings/
 .vscode/
+
+### Project Specific ###
+secrets.js
+ngrok.exe
