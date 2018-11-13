@@ -1,30 +1,9 @@
 const dialogflow = require('dialogflow');
-const request = require('request');
 
 const { db } = require('../db/dbClient')
-const { FB_ACCESS_TOKEN, FB_APP_ID } = require('../secrets')
-
+const fbSendTextMessage = require('./fbSendTextMessage')
 const LANGUAGE_CODE = 'en-US';
 const dfQuery = 'hello';
-
-const fbSendTextMessage = (senderId, text) => {
-    request.post({
-        url: `https://graph.facebook.com/v2.6/me/messages`,
-        qs: { access_token: FB_ACCESS_TOKEN },
-        json: {
-            recipient: {
-                id: senderId
-            },
-            message: {
-                text: text
-            }
-        }
-    },
-        function (error, response, body) {
-            console.log('statusCode:', response && response.statusCode);
-        }
-    )
-};
 
 function checkIfUserAlreadyInDb(senderId) {
     const query = `SELECT senderId senderId
@@ -36,8 +15,17 @@ function checkIfUserAlreadyInDb(senderId) {
         }
         if (row) {
             console.log(`${row.senderId} already in DB`);
+            fbSendTextMessage(senderId, `If you want to  : 
+- change your content,
+- contact with my papa
+- unsubscribe my services 
+
+Just ask me ;)`);
         } else {
             console.log(`${senderId} not yet in DB`);
+            fbSendTextMessage(senderId, `Hi, I'm  DailyRoutineBot.
+My purpose is to deliver valuable content to you - daily.
+If you want to subscribe to my services or want me to say more about content I send - just ask me ;)`);
             insertUserToDb(senderId);
         }
     })
@@ -50,10 +38,16 @@ function insertUserToDb(senderId) {
     console.log(`A row has been inserted with rowId ${this.lastID} and snederId ${senderId}`);
 }
 
-module.exports = (event) => {
+function processMessage(event) {
     const senderId = event.sender.id;
     const message = event.message.text;
     console.log(senderId, message)
     checkIfUserAlreadyInDb(senderId)
-    fbSendTextMessage(senderId, 'O kurwa ale ze mnie mondry chatbot 8)')
 };
+
+module.exports = processMessage
+
+// 1 query all users
+// 2 foreach user in users
+//       setTimeout(24*60*60*1000, fbSendTextMessage(user.senderId,))
+// 
