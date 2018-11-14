@@ -1,9 +1,9 @@
-const { VERIFY_TOKEN } = require('../secrets')
+const { FB_VERIFY_TOKEN } = require('../secrets')
 
 module.exports = (req, res) => {
     const hubChallenge = req.query['hub.challenge'];
     const hubMode = req.query['hub.mode'];
-    const verifyTokenMatches = (req.query['hub.verify_token'] === VERIFY_TOKEN);
+    const verifyTokenMatches = (req.query['hub.verify_token'] === FB_VERIFY_TOKEN);
     if (hubMode && verifyTokenMatches) {
         res.status(200).send(hubChallenge);
     } else {

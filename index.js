@@ -28,7 +28,7 @@ let server = app.listen(3000, () => console.log('Webhook listening at 3000'));
 app.get('/', verificationController);
 app.post('/', messageController);
 
-dailyRoutine();
+// dailyRoutine();
 
 process.on('SIGINT', () => {
     closeDb();

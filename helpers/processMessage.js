@@ -1,11 +1,8 @@
-const dialogflow = require('dialogflow');
-
 const { db } = require('../db/dbClient')
 const fbSendTextMessage = require('./fbSendTextMessage')
-const LANGUAGE_CODE = 'en-US';
-const dfQuery = 'hello';
+const getResponseFromDF = require('./NLU')
 
-function checkIfUserAlreadyInDb(senderId) {
+function checkIfUserAlreadyInDb(senderId, message) {
     const query = `SELECT senderId senderId
                 FROM users
                 WHERE senderId = ?`;
@@ -15,17 +12,18 @@ function checkIfUserAlreadyInDb(senderId) {
         }
         if (row) {
             console.log(`${row.senderId} already in DB`);
-            fbSendTextMessage(senderId, `If you want to  : 
-- change your content,
-- contact with my papa
-- unsubscribe my services 
-
-Just ask me ;)`);
+            getResponseFromDF(message, senderId, fbSendTextMessage)
         } else {
             console.log(`${senderId} not yet in DB`);
+            getResponseFromDF(message, senderId)
             fbSendTextMessage(senderId, `Hi, I'm  DailyRoutineBot.
 My purpose is to deliver valuable content to you - daily.
-If you want to subscribe to my services or want me to say more about content I send - just ask me ;)`);
+This is what you can do : 
+- list content i send
+- contact with my maker
+- subscribe my services
+- unsubscribe my services
+Just ask me in english ;)`);
             insertUserToDb(senderId);
         }
     })
@@ -42,12 +40,7 @@ function processMessage(event) {
     const senderId = event.sender.id;
     const message = event.message.text;
     console.log(senderId, message)
-    checkIfUserAlreadyInDb(senderId)
+    checkIfUserAlreadyInDb(senderId, message)
 };
 
 module.exports = processMessage
-
-// 1 query all users
-// 2 foreach user in users
-//       setTimeout(24*60*60*1000, fbSendTextMessage(user.senderId,))
-// 
